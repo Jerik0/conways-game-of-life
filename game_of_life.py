@@ -27,15 +27,10 @@ set_data()
 
 def simulate_board_change():
     set_data()
-    # Redraw the canvas
-    ax.clear()
-    table = ax.table(cellText=data, loc='center')
-    ax.axis('off')
     color_cells()
     fig.canvas.draw()
 
 def on_key(event):
-    print(event)
     if event.key == 'r':
         simulate_board_change()
 
@@ -79,25 +74,15 @@ def get_empty_coords():
                 empty_coords.append((row, column))
     return empty_coords
 
-def clear_board():
+def color_cells():
     for row in range(len(data)):
         for column in range(len(data[row])):
-            table[row, column].set_facecolor('white')
-            ax.add_patch(table[row, column])
-
-def color_cells():
-    clear_board()
-    for coords in get_filled_coords():
-        table[coords].set_facecolor('black')
-        table[coords].get_text().set_color('black')
-        ax.add_patch(table[coords])
-
-    for coords in get_empty_coords():
-        table[coords].get_text().set_color('white')
-        ax.add_patch(table[coords])
-
-def close_board():
-    plt.close()
+            if data[row][column] == 1:
+                table[row, column].set_facecolor('black')
+                table[row, column].get_text().set_color('black')
+            else:
+                table[row, column].set_facecolor('white')
+                table[row, column].get_text().set_color('white')
 
 print("neighbors of cell (1, 1):")
 print(get_neighbors(1, 1))
