@@ -13,6 +13,7 @@ ax.axis('off')
 
 # handle data
 def set_data():
+    print("setting data")
     for i in range(25):
         for j in range(25):
             random_number = random.randint(0, 50)
@@ -20,8 +21,23 @@ def set_data():
                 data[i][j] = 1
             else:
                 data[i][j] = 0
+    print(data)
 
 set_data()
+
+def simulate_board_change():
+    set_data()
+    # Redraw the canvas
+    ax.clear()
+    table = ax.table(cellText=data, loc='center')
+    ax.axis('off')
+    color_cells()
+    fig.canvas.draw()
+
+def on_key(event):
+    print(event)
+    if event.key == 'r':
+        simulate_board_change()
 
 # helper functions
 def get_column_data(column: int):
@@ -63,9 +79,17 @@ def get_empty_coords():
                 empty_coords.append((row, column))
     return empty_coords
 
+def clear_board():
+    for row in range(len(data)):
+        for column in range(len(data[row])):
+            table[row, column].set_facecolor('white')
+            ax.add_patch(table[row, column])
+
 def color_cells():
+    clear_board()
     for coords in get_filled_coords():
         table[coords].set_facecolor('black')
+        table[coords].get_text().set_color('black')
         ax.add_patch(table[coords])
 
     for coords in get_empty_coords():
@@ -80,16 +104,17 @@ print(get_neighbors(1, 1))
 
 # fill and show board
 color_cells()
+
+fig.canvas.mpl_connect('key_press_event', on_key)
 plt.show()
+
 # def on_press(key):
 #     try:
 #         print('alphanumeric key {0} pressed'.format(key.char))
+#         simulate_board_change()
 #     except AttributeError:
 #         print('special key {0} pressed'.format(key))
-#         if key == keyboard.Key.space:
-#             set_data()
-#             color_cells()
-#             show_board()
+#
 #
 # def on_release(key):
 #     print('{0} released'.format(key))
