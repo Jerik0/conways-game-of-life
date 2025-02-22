@@ -25,10 +25,52 @@ def set_data():
 
 set_data()
 
+def get_neighbors(row: int, column: int):
+    neighbors = []
+    for i in range(row - 1, row + 2):
+        for j in range(column - 1, column + 2):
+            if i == row and j == column:
+                continue
+            if i < 0 or i >= len(data) or j < 0 or j >= len(data[i]):
+                continue
+            neighbors.append(data[i][j])
+    return neighbors
+
 def simulate_board_change():
     set_data()
     color_cells()
     fig.canvas.draw()
+    print(f"neighbors of (1, 1): {get_neighbors(1, 1)}")
+
+def advance_board():
+    for i in range(25):
+        for j in range(25):
+            neighbors = get_neighbors(i, j)
+            if data[i][j] == 1:
+                if neighbors.count(1) == 2 or neighbors.count(1) == 3:
+                    continue
+                if neighbors.count(1) > 3:
+                    data[i][j] = 0
+                if neighbors.count(1) <= 1:
+                    data[i][j] = 0
+
+            if data[i][j] == 0:
+                if neighbors.count(1) == 3:
+                    data[i][j] = 1
+
+    # for every cell on the board, check its neighbors
+    # Birth: A dead cell with exactly three live neighbors becomes alive in the next generation
+    # if 0 and has three live neighbors, change to 1 in next iteration.
+
+    # Death by isolation: A live cell with one or fewer live neighbors dies in the next generation
+    # if 1 and has one or fewer neighbors, change to 0
+
+    # Death by overcrowding: A live cell with four or more live neighbors dies in the next generation
+    # if 1 and has four or more 1 neighbors, change to 0
+
+    # Survival: A live cell with two or three live neighbors lives on to the next generation
+    # if 1 and has two or three 1 neighbors, stay the same
+    return
 
 def on_key(event):
     if event.key == 'r':
@@ -46,17 +88,6 @@ def get_row_data(row: int):
 
 def get_cell_data(row: int, column: int):
     return data[row][column]
-
-def get_neighbors(row: int, column: int):
-    neighbors = []
-    for i in range(row - 1, row + 2):
-        for j in range(column - 1, column + 2):
-            if i == row and j == column:
-                continue
-            if i < 0 or i >= len(data) or j < 0 or j >= len(data[i]):
-                continue
-            neighbors.append(data[i][j])
-    return neighbors
 
 def get_filled_coords():
     filled_coords = []
@@ -84,14 +115,31 @@ def color_cells():
                 table[row, column].set_facecolor('white')
                 table[row, column].get_text().set_color('white')
 
-print("neighbors of cell (1, 1):")
-print(get_neighbors(1, 1))
-
 # fill and show board
 color_cells()
 
 fig.canvas.mpl_connect('key_press_event', on_key)
 plt.show()
+
+# ========= TESTS =========
+# for row in data:
+#     print(row)
+# print(get_column_data(1))
+# print(get_row_data(0))
+# print(get_cell_data(1, 1))
+# print("filled coords:")
+# print(get_filled_coords())
+
+
+
+# Highlight a specific cell (e.g., row 1, column 1)
+# cell = table[1, 1]
+# cell.set_facecolor('lightgreen')
+# ax.add_patch(cell)
+
+# rules for the pieces to decide how to behave
+
+# re-draw the board after pieces decide what to do
 
 # def on_press(key):
 #     try:
@@ -112,26 +160,3 @@ plt.show()
 #         on_press=on_press,
 #         on_release=on_release) as listener:
 #     listener.join()
-
-# ========= TESTS =========
-# for row in data:
-#     print(row)
-# print(get_column_data(1))
-# print(get_row_data(0))
-# print(get_cell_data(1, 1))
-# print("filled coords:")
-# print(get_filled_coords())
-
-# Birth: A dead cell with exactly three live neighbors becomes alive in the next generation
-# Death by isolation: A live cell with one or fewer live neighbors dies in the next generation
-# Death by overcrowding: A live cell with four or more live neighbors dies in the next generation
-# Survival: A live cell with two or three live neighbors lives on to the next generation
-
-# Highlight a specific cell (e.g., row 1, column 1)
-# cell = table[1, 1]
-# cell.set_facecolor('lightgreen')
-# ax.add_patch(cell)
-
-# rules for the pieces to decide how to behave
-
-# re-draw the board after pieces decide what to do
