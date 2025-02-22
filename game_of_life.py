@@ -17,7 +17,7 @@ def set_data():
     for i in range(25):
         for j in range(25):
             random_number = random.randint(0, 50)
-            if random_number < 6:
+            if random_number < 13:
                 data[i][j] = 1
             else:
                 data[i][j] = 0
@@ -43,6 +43,7 @@ def simulate_board_change():
     print(f"neighbors of (1, 1): {get_neighbors(1, 1)}")
 
 def advance_board():
+    print("advancing board")
     for i in range(25):
         for j in range(25):
             neighbors = get_neighbors(i, j)
@@ -57,6 +58,20 @@ def advance_board():
             if data[i][j] == 0:
                 if neighbors.count(1) == 3:
                     data[i][j] = 1
+    print(data)
+    color_cells()
+    fig.canvas.draw()
+
+def run_every_x_ms(interval_ms, function):
+    interval_seconds = interval_ms / 1000.0
+    while True:
+        start_time = time.time()
+        function()
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        sleep_time = interval_seconds - elapsed_time
+        if sleep_time > 0:
+            time.sleep(sleep_time)
 
     # for every cell on the board, check its neighbors
     # Birth: A dead cell with exactly three live neighbors becomes alive in the next generation
@@ -70,11 +85,10 @@ def advance_board():
 
     # Survival: A live cell with two or three live neighbors lives on to the next generation
     # if 1 and has two or three 1 neighbors, stay the same
-    return
 
 def on_key(event):
     if event.key == 'r':
-        simulate_board_change()
+        advance_board()
 
 # helper functions
 def get_column_data(column: int):
@@ -120,6 +134,9 @@ color_cells()
 
 fig.canvas.mpl_connect('key_press_event', on_key)
 plt.show()
+
+# Example usage: Run the task every 500 milliseconds
+run_every_x_ms(1000, advance_board)
 
 # ========= TESTS =========
 # for row in data:
